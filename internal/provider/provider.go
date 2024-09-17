@@ -5,6 +5,7 @@ package provider
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/function"
@@ -55,8 +56,8 @@ func (p *AWSIPRangesProvider) Configure(ctx context.Context, req provider.Config
 		return
 	}
 
-	// TODO: determine if cachefile location can be passed to functions, given
-	// there is no equivalent `FunctionsData` field in the response.
+	client := http.DefaultClient
+	resp.DataSourceData = client
 }
 
 func (p *AWSIPRangesProvider) Resources(ctx context.Context) []func() resource.Resource {
@@ -64,13 +65,13 @@ func (p *AWSIPRangesProvider) Resources(ctx context.Context) []func() resource.R
 }
 
 func (p *AWSIPRangesProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
-	return []func() datasource.DataSource{}
+	return []func() datasource.DataSource{
+		NewContainsDataSource,
+	}
 }
 
 func (p *AWSIPRangesProvider) Functions(ctx context.Context) []func() function.Function {
-	return []func() function.Function{
-		NewContainsFunction,
-	}
+	return []func() function.Function{}
 }
 
 func New(version string) func() provider.Provider {
