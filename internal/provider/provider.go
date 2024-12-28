@@ -55,11 +55,13 @@ func (p *AWSIPRangesProvider) Schema(ctx context.Context, req provider.SchemaReq
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"cachefile": schema.StringAttribute{
-				MarkdownDescription: "Location to cache the ip-ranges.json file",
-				Optional:            true,
+				MarkdownDescription: "Location to cache the ip-ranges.json file. The provider will attempt" +
+					"to cache the ranges file in a default location and read from it on subsequent runs if no " +
+					"value is provided.",
+				Optional: true,
 			},
 			"expiration": schema.StringAttribute{
-				MarkdownDescription: "Duration after which the cached ranges file should be replaced",
+				MarkdownDescription: "Duration after which the cached ranges file should be replaced.",
 				Optional:            true,
 			},
 		},

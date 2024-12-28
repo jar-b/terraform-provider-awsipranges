@@ -23,4 +23,5 @@ provider "scaffolding" {
 
 ### Optional
 
-- `cachefile` (String) Location to cache the ip-ranges.json file
+- `cachefile` (String) Location to cache the ip-ranges.json file. The provider will attemptto cache the ranges file in a default location and read from it on subsequent runs if no value is provided.
+- `expiration` (String) Duration after which the cached ranges file should be replaced.
