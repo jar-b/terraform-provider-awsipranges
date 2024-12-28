@@ -3,12 +3,12 @@ package provider
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/jar-b/awsipranges"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -20,7 +20,7 @@ func NewRangesDataSource() datasource.DataSource {
 
 // RangesDataSource defines the data source implementation.
 type RangesDataSource struct {
-	client *http.Client
+	ranges *awsipranges.AWSIPRanges
 }
 
 // RangesDataSourceModel describes the data source data model.
@@ -56,17 +56,17 @@ func (d *RangesDataSource) Configure(ctx context.Context, req datasource.Configu
 		return
 	}
 
-	client, ok := req.ProviderData.(*http.Client)
+	ranges, ok := req.ProviderData.(*awsipranges.AWSIPRanges)
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Data Source Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *awsipranges.AWSIPRanges, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
 	}
 
-	d.client = client
+	d.ranges = ranges
 }
 
 func (d *RangesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {

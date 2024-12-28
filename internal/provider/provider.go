@@ -1,11 +1,13 @@
-// Copyright (c) HashiCorp, Inc.
-// SPDX-License-Identifier: MPL-2.0
-
 package provider
 
 import (
 	"context"
-	"net/http"
+	"encoding/json"
+	"fmt"
+	"os"
+	"os/user"
+	"path/filepath"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/function"
@@ -13,9 +15,20 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/jar-b/awsipranges"
 )
 
-// Ensure ScaffoldingProvider satisfies various provider interfaces.
+const (
+	cachefilePath = ".aws/ip-ranges.json"
+
+	// createDateFormat is the format of the `createDate` field in the
+	// underlying JSON (YY-MM-DD-hh-mm-ss)
+	//
+	// Ref: https://docs.aws.amazon.com/vpc/latest/userguide/aws-ip-syntax.html
+	createDateFormat = "2006-01-02-15-04-05"
+)
+
 var _ provider.Provider = &AWSIPRangesProvider{}
 var _ provider.ProviderWithFunctions = &AWSIPRangesProvider{}
 
@@ -61,8 +74,16 @@ func (p *AWSIPRangesProvider) Configure(ctx context.Context, req provider.Config
 		return
 	}
 
-	client := http.DefaultClient
-	resp.DataSourceData = client
+	cachefile := data.Cachefile.ValueString()
+	if data.Cachefile.IsNull() {
+		cachefile = defaultCachefilePath()
+	}
+
+	ranges, err := loadRanges(ctx, cachefile, data.Expiration.ValueString())
+	if err != nil {
+	}
+
+	resp.DataSourceData = ranges
 }
 
 func (p *AWSIPRangesProvider) Resources(ctx context.Context) []func() resource.Resource {
@@ -85,4 +106,68 @@ func New(version string) func() provider.Provider {
 			version: version,
 		}
 	}
+}
+
+// defaultCachefilePath constructs a default path to the cachefile
+func defaultCachefilePath() string {
+	u, _ := user.Current()
+	return filepath.Join(u.HomeDir, cachefilePath)
+}
+
+// isExpired checks whether the createDate of a cached ip-ranges.json
+// file is older than the configured expiration duration
+//
+// If expiration is not set, always returns false.
+func isExpired(ctx context.Context, createDate, expiration string) (bool, error) {
+	if expiration == "" {
+		return false, nil
+	}
+
+	created, err := time.Parse(createDateFormat, createDate)
+	if err != nil {
+		return false, err
+	}
+	expirationDuration, err := time.ParseDuration(expiration)
+	if err != nil {
+		return false, err
+	}
+
+	if expirationDuration > time.Since(created) {
+		return false, nil
+	}
+
+	tflog.Debug(ctx, "cache is expired, refreshing")
+	return true, nil
+}
+
+// loadRanges attempts to read ip-ranges data from cache, falling back
+// to fetching the source file if os.ReadFile fails or the creation date
+// exceeds the configured cache expiration time
+func loadRanges(ctx context.Context, cachefile, expiration string) (*awsipranges.AWSIPRanges, error) {
+	if b, err := os.ReadFile(cachefile); err == nil {
+		var ranges awsipranges.AWSIPRanges
+		if err := json.Unmarshal(b, &ranges); err == nil {
+			if exp, err := isExpired(ctx, ranges.CreateDate, expiration); err != nil {
+				return nil, err
+			} else if !exp {
+				return &ranges, nil
+			}
+		}
+	}
+
+	b, err := awsipranges.Get()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := os.WriteFile(cachefile, b, 0644); err != nil {
+		tflog.Debug(ctx, fmt.Sprintf("cache write failed: %s", err))
+	}
+
+	var ranges awsipranges.AWSIPRanges
+	if err := json.Unmarshal(b, &ranges); err != nil {
+		return nil, err
+	}
+
+	return &ranges, nil
 }
