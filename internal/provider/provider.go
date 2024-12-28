@@ -29,7 +29,8 @@ type AWSIPRangesProvider struct {
 
 // AWSIPRangesProviderModel describes the provider data model.
 type AWSIPRangesProviderModel struct {
-	Cachefile types.String `tfsdk:"cachefile"`
+	Cachefile  types.String `tfsdk:"cachefile"`
+	Expiration types.String `tfsdk:"expiration"`
 }
 
 func (p *AWSIPRangesProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -42,6 +43,10 @@ func (p *AWSIPRangesProvider) Schema(ctx context.Context, req provider.SchemaReq
 		Attributes: map[string]schema.Attribute{
 			"cachefile": schema.StringAttribute{
 				MarkdownDescription: "Location to cache the ip-ranges.json file",
+				Optional:            true,
+			},
+			"expiration": schema.StringAttribute{
+				MarkdownDescription: "Duration after which the cached ranges file should be replaced",
 				Optional:            true,
 			},
 		},
