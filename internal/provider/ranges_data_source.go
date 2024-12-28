@@ -12,28 +12,28 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ datasource.DataSource = &ContainsDataSource{}
+var _ datasource.DataSource = &RangesDataSource{}
 
-func NewContainsDataSource() datasource.DataSource {
-	return &ContainsDataSource{}
+func NewRangesDataSource() datasource.DataSource {
+	return &RangesDataSource{}
 }
 
-// ContainsDataSource defines the data source implementation.
-type ContainsDataSource struct {
+// RangesDataSource defines the data source implementation.
+type RangesDataSource struct {
 	client *http.Client
 }
 
-// ContainsDataSourceModel describes the data source data model.
-type ContainsDataSourceModel struct {
+// RangesDataSourceModel describes the data source data model.
+type RangesDataSourceModel struct {
 	IPAddress types.String `tfsdk:"ip_address"`
 	Id        types.String `tfsdk:"id"`
 }
 
-func (d *ContainsDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_contains"
+func (d *RangesDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_ranges"
 }
 
-func (d *ContainsDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *RangesDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Checks whether an IP address is in an AWS range.",
 
@@ -50,7 +50,7 @@ func (d *ContainsDataSource) Schema(ctx context.Context, req datasource.SchemaRe
 	}
 }
 
-func (d *ContainsDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *RangesDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
 		return
@@ -69,8 +69,8 @@ func (d *ContainsDataSource) Configure(ctx context.Context, req datasource.Confi
 	d.client = client
 }
 
-func (d *ContainsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data ContainsDataSourceModel
+func (d *RangesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var data RangesDataSourceModel
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {

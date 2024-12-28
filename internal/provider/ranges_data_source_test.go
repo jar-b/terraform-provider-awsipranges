@@ -6,23 +6,23 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-func TestAccContainsDataSource(t *testing.T) {
+func TestAccRangesDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccContainsDataSourceConfig,
+				Config: testAccRangesDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.awsipranges_contains.test", "id", "example-id"),
+					resource.TestCheckResourceAttr("data.awsipranges_ranges.test", "id", "example-id"),
 				),
 			},
 		},
 	})
 }
 
-const testAccContainsDataSourceConfig = `
-data "awsipranges_contains" "test" {
+const testAccRangesDataSourceConfig = `
+data "awsipranges_ranges" "test" {
   ip_address = "3.5.12.4"
 }
 `

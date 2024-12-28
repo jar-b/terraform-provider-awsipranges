@@ -71,7 +71,7 @@ func (p *AWSIPRangesProvider) Resources(ctx context.Context) []func() resource.R
 
 func (p *AWSIPRangesProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		NewContainsDataSource,
+		NewRangesDataSource,
 	}
 }
 
