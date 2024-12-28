@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -25,8 +26,21 @@ type RangesDataSource struct {
 
 // RangesDataSourceModel describes the data source data model.
 type RangesDataSourceModel struct {
-	IPAddress types.String `tfsdk:"ip_address"`
-	Id        types.String `tfsdk:"id"`
+	Filters types.List   `tfsdk:"filters"`
+	Id      types.String `tfsdk:"id"`
+}
+
+// FilterModel stores the filter type and value used to filter results.
+type FilterModel struct {
+	Type  types.String `tfsdk:"type"`
+	Value types.String `tfsdk:"value"`
+}
+
+var rangeAttrType = map[string]attr.Type{
+	"ip_prefix":            types.StringType,
+	"region":               types.StringType,
+	"network_border_group": types.StringType,
+	"service":              types.StringType,
 }
 
 func (d *RangesDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -38,9 +52,20 @@ func (d *RangesDataSource) Schema(ctx context.Context, req datasource.SchemaRequ
 		MarkdownDescription: "Checks whether an IP address is in an AWS range.",
 
 		Attributes: map[string]schema.Attribute{
-			"ip_address": schema.StringAttribute{
-				MarkdownDescription: "IP address to search for",
-				Required:            true,
+			"filters": schema.ListNestedAttribute{
+				MarkdownDescription: "Filters to apply to the IP ranges data set. Filtering can " +
+					"be done on IP address, network border group, region, and service.",
+				Optional: true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"type": schema.StringAttribute{
+							Required: true,
+						},
+						"value": schema.StringAttribute{
+							Required: true,
+						},
+					},
+				},
 			},
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Contains identifier",
@@ -77,13 +102,25 @@ func (d *RangesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 		return
 	}
 
-	// If applicable, this is a great opportunity to initialize any necessary
-	// provider client data and make a call using it.
-	// httpResp, err := d.client.Do(httpReq)
-	// if err != nil {
-	//     resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read example, got error: %s", err))
-	//     return
-	// }
+	var tfFilters []FilterModel
+	resp.Diagnostics.Append(data.Filters.ElementsAs(ctx, &tfFilters, false)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var ipFilters []awsipranges.Filter
+	for _, f := range tfFilters {
+		ipFilters = append(ipFilters, awsipranges.Filter{
+			Type:  awsipranges.FilterType(f.Type.ValueString()),
+			Value: f.Value.ValueString(),
+		})
+	}
+
+	_, err := d.ranges.Filter(ipFilters)
+	if err != nil {
+		resp.Diagnostics.AddError("Filter error", err.Error())
+		return
+	}
 
 	// For the purposes of this example code, hardcoding a response value to
 	// save into the Terraform state.

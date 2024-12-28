@@ -23,6 +23,11 @@ func TestAccRangesDataSource(t *testing.T) {
 
 const testAccRangesDataSourceConfig = `
 data "awsipranges_ranges" "test" {
-  ip_address = "3.5.12.4"
+  filters = [
+	{
+	  type  = "ip"
+	  value = "3.5.12.4"
+	}
+  ]
 }
 `
