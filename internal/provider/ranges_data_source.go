@@ -26,8 +26,8 @@ type RangesDataSource struct {
 
 // RangesDataSourceModel describes the data source data model.
 type RangesDataSourceModel struct {
-	Filters types.List   `tfsdk:"filters"`
-	Id      types.String `tfsdk:"id"`
+	Filters    types.List `tfsdk:"filters"`
+	IPPrefixes types.List `tfsdk:"ip_prefixes"`
 }
 
 // FilterModel stores the filter type and value used to filter results.
@@ -36,7 +36,7 @@ type FilterModel struct {
 	Value types.String `tfsdk:"value"`
 }
 
-var rangeAttrType = map[string]attr.Type{
+var ipPrefixAttrType = map[string]attr.Type{
 	"ip_prefix":            types.StringType,
 	"region":               types.StringType,
 	"network_border_group": types.StringType,
@@ -60,16 +60,35 @@ func (d *RangesDataSource) Schema(ctx context.Context, req datasource.SchemaRequ
 					Attributes: map[string]schema.Attribute{
 						"type": schema.StringAttribute{
 							Required: true,
+							MarkdownDescription: "Filter type. Valid values are: `ip`, `region`, " +
+								"`network_border_group`, and `service`.",
 						},
 						"value": schema.StringAttribute{
-							Required: true,
+							Required:            true,
+							MarkdownDescription: "Filter value.",
 						},
 					},
 				},
 			},
-			"id": schema.StringAttribute{
-				MarkdownDescription: "Contains identifier",
+			"ip_prefixes": schema.ListNestedAttribute{
+				MarkdownDescription: "A list of IP address prefixes matching the filter criteria.",
 				Computed:            true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"ip_prefix": schema.StringAttribute{
+							Computed: true,
+						},
+						"region": schema.StringAttribute{
+							Computed: true,
+						},
+						"network_border_group": schema.StringAttribute{
+							Computed: true,
+						},
+						"service": schema.StringAttribute{
+							Computed: true,
+						},
+					},
+				},
 			},
 		},
 	}
@@ -115,21 +134,34 @@ func (d *RangesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 			Value: f.Value.ValueString(),
 		})
 	}
+	tflog.Debug(ctx, fmt.Sprintf("applying filters: %s", ipFilters))
 
-	_, err := d.ranges.Filter(ipFilters)
+	ipPrefixes, err := d.ranges.Filter(ipFilters)
 	if err != nil {
 		resp.Diagnostics.AddError("Filter error", err.Error())
 		return
 	}
 
-	// For the purposes of this example code, hardcoding a response value to
-	// save into the Terraform state.
-	data.Id = types.StringValue("example-id")
+	elemType := types.ObjectType{AttrTypes: ipPrefixAttrType}
+	elems := []attr.Value{}
+	for _, p := range ipPrefixes {
+		obj := map[string]attr.Value{
+			"ip_prefix":            types.StringValue(p.IPPrefix),
+			"region":               types.StringValue(p.Region),
+			"network_border_group": types.StringValue(p.NetworkBorderGroup),
+			"service":              types.StringValue(p.Service),
+		}
 
-	// Write logs using the tflog package
-	// Documentation: https://terraform.io/plugin/log
-	tflog.Trace(ctx, "read a data source")
+		// TODO: rm Must and handle diags
+		elems = append(elems, types.ObjectValueMust(ipPrefixAttrType, obj))
+	}
 
-	// Save data into Terraform state
+	if len(ipPrefixes) > 0 {
+		// TODO: rm Must and handle diags
+		data.IPPrefixes = types.ListValueMust(elemType, elems)
+	} else {
+		data.IPPrefixes = types.ListNull(elemType)
+	}
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

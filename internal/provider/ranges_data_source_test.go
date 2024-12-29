@@ -14,7 +14,7 @@ func TestAccRangesDataSource(t *testing.T) {
 			{
 				Config: testAccRangesDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.awsipranges_ranges.test", "id", "example-id"),
+					resource.TestCheckResourceAttr("data.awsipranges_ranges.test", "ip_prefixes.#", "3"),
 				),
 			},
 		},
@@ -24,10 +24,10 @@ func TestAccRangesDataSource(t *testing.T) {
 const testAccRangesDataSourceConfig = `
 data "awsipranges_ranges" "test" {
   filters = [
-	{
-	  type  = "ip"
-	  value = "3.5.12.4"
-	}
+    {
+      type  = "ip"
+      value = "3.5.12.4"
+    }
   ]
 }
 `
