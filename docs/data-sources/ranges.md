@@ -21,12 +21,23 @@ Checks whether an IP address is in an AWS range.
 
 ### Read-Only
 
-- `id` (String) Contains identifier
+- `ip_prefixes` (Attributes List) A list of IP address prefixes matching the filter criteria. (see [below for nested schema](#nestedatt--ip_prefixes))
 
 <a id="nestedatt--filters"></a>
 ### Nested Schema for `filters`
 
 Required:
 
-- `type` (String)
-- `value` (String)
+- `type` (String) Filter type. Valid values are: `ip`, `region`, `network_border_group`, and `service`.
+- `value` (String) Filter value.
+
+
+<a id="nestedatt--ip_prefixes"></a>
+### Nested Schema for `ip_prefixes`
+
+Read-Only:
+
+- `ip_prefix` (String) Public IPv4 address range, in CIDR notation.
+- `network_border_group` (String) Name of the network border group, which is a unique set of Availability Zones or Local Zones from which AWS advertises IP addresses, or `GLOBAL`.
+- `region` (String) AWS Region or `GLOBAL`.
+- `service` (String) Subset of IP address ranges.

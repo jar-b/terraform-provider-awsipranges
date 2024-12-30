@@ -76,16 +76,21 @@ func (d *RangesDataSource) Schema(ctx context.Context, req datasource.SchemaRequ
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"ip_prefix": schema.StringAttribute{
-							Computed: true,
-						},
-						"region": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							MarkdownDescription: "Public IPv4 address range, in CIDR notation.",
 						},
 						"network_border_group": schema.StringAttribute{
 							Computed: true,
+							MarkdownDescription: "Name of the network border group, which is a unique set of " +
+								"Availability Zones or Local Zones from which AWS advertises IP addresses, or `GLOBAL`.",
+						},
+						"region": schema.StringAttribute{
+							Computed:            true,
+							MarkdownDescription: "AWS Region or `GLOBAL`.",
 						},
 						"service": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							MarkdownDescription: "Subset of IP address ranges.",
 						},
 					},
 				},
