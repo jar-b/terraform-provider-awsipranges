@@ -2,6 +2,8 @@
 
 Terraform provider for interacting with AWS IP ranges data.
 
+This provider offers the same functionality as the [`aws_ip_ranges` data source](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ip_ranges) in the [AWS provider](https://registry.terraform.io/providers/hashicorp/aws/latest), but with some marginal benefits such as a smaller binary size and optional caching to improve performance.
+
 ## Requirements
 
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
@@ -17,23 +19,50 @@ Terraform provider for interacting with AWS IP ranges data.
 go install
 ```
 
-## Adding Dependencies
-
-This provider uses [Go modules](https://github.com/golang/go/wiki/Modules).
-Please see the Go documentation for the most up to date information about using Go modules.
-
-To add a new dependency `github.com/author/dependency` to your Terraform provider:
-
-```shell
-go get github.com/author/dependency
-go mod tidy
-```
-
-Then commit the changes to `go.mod` and `go.sum`.
-
 ## Using the provider
 
-Fill this in for each provider
+This provider currently only exposes one data source for fetching and filtering IPv4 ranges published by AWS.
+The ranges can be filtered by IP address, region, network border group, or service.
+Example are included below.
+
+### Filterting by IP Address
+
+```terraform
+data "awsipranges_ranges" "example" {
+  filters = [
+    {
+      type  = "ip"
+      value = "3.5.12.4"
+    }
+  ]
+}
+```
+
+### Filtering by Region
+
+```terraform
+data "awsipranges_ranges" "example" {
+  filters = [
+    {
+      type  = "region"
+      value = "us-east-1"
+    }
+  ]
+}
+```
+
+### Filtering by Service
+
+```terraform
+data "awsipranges_ranges" "example" {
+  filters = [
+    {
+      type  = "service"
+      value = "S3"
+    }
+  ]
+}
+```
 
 ## Developing the Provider
 
@@ -41,11 +70,13 @@ If you wish to work on the provider, you'll first need [Go](http://www.golang.or
 
 To compile the provider, run `go install`. This will build the provider and put the provider binary in the `$GOPATH/bin` directory.
 
-To generate or update documentation, run `go generate`.
+To generate or update documentation, run `make generate`.
+
+```shell
+make generate
+```
 
 In order to run the full suite of Acceptance tests, run `make testacc`.
-
-*Note:* Acceptance tests create real resources, and often cost money to run.
 
 ```shell
 make testacc
