@@ -25,8 +25,8 @@ const testAccRangesDataSourceConfig = `
 data "awsipranges_ranges" "test" {
   filters = [
     {
-      type  = "ip"
-      value = "3.5.12.4"
+      type   = "ip"
+      values = ["3.5.12.4"]
     }
   ]
 }

@@ -40,7 +40,7 @@ data "awsipranges_ranges" "example" {
 Required:
 
 - `type` (String) Filter type. Valid values are: `ip`, `region`, `network_border_group`, and `service`.
-- `value` (String) Filter value.
+- `values` (List of String) Filter values.
 
 
 <a id="nestedatt--ip_prefixes"></a>

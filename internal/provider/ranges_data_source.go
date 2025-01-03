@@ -32,8 +32,8 @@ type RangesDataSourceModel struct {
 
 // FilterModel stores the filter type and value used to filter results.
 type FilterModel struct {
-	Type  types.String `tfsdk:"type"`
-	Value types.String `tfsdk:"value"`
+	Type   types.String `tfsdk:"type"`
+	Values types.List   `tfsdk:"values"`
 }
 
 var ipPrefixAttrType = map[string]attr.Type{
@@ -63,9 +63,10 @@ func (d *RangesDataSource) Schema(ctx context.Context, req datasource.SchemaRequ
 							MarkdownDescription: "Filter type. Valid values are: `ip`, `region`, " +
 								"`network_border_group`, and `service`.",
 						},
-						"value": schema.StringAttribute{
+						"values": schema.ListAttribute{
+							ElementType:         types.StringType,
 							Required:            true,
-							MarkdownDescription: "Filter value.",
+							MarkdownDescription: "Filter values.",
 						},
 					},
 				},
@@ -134,9 +135,15 @@ func (d *RangesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 
 	var ipFilters []awsipranges.Filter
 	for _, f := range tfFilters {
+		var values []string
+		resp.Diagnostics.Append(f.Values.ElementsAs(ctx, &values, false)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+
 		ipFilters = append(ipFilters, awsipranges.Filter{
-			Type:  awsipranges.FilterType(f.Type.ValueString()),
-			Value: f.Value.ValueString(),
+			Type:   awsipranges.FilterType(f.Type.ValueString()),
+			Values: values,
 		})
 	}
 	tflog.Debug(ctx, fmt.Sprintf("applying filters: %s", ipFilters))

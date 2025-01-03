@@ -94,6 +94,8 @@ github.com/hashicorp/yamux v0.1.1 h1:yrQxtgseBDrq9Y652vSRDvsKCJKOUD+GzTS4Y0Y8pvE
 github.com/hashicorp/yamux v0.1.1/go.mod h1:CtWFDAQgb7dxtzFs4tWbplKIe2jSi3+5vKbgIO0SLnQ=
 github.com/jar-b/awsipranges v0.0.3 h1:G2yvAnAPYEFZfws3HlNM7Unfy6ZoWMK7bSkTX81yvWg=
 github.com/jar-b/awsipranges v0.0.3/go.mod h1:qyMDZxniZtepZ4xXlYF+9EThtjpXYGt7k9TqhUE+Cc8=
+github.com/jar-b/awsipranges v0.0.7 h1:PzrIt+WQilFv6Jf5LM58IeodzKs4VVILohYFHBQyPGQ=
+github.com/jar-b/awsipranges v0.0.7/go.mod h1:qyMDZxniZtepZ4xXlYF+9EThtjpXYGt7k9TqhUE+Cc8=
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 h1:BQSFePA1RWJOlocH6Fxy8MmwDt+yVQYULKfN0RoTN8A=
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99/go.mod h1:1lJo3i6rXxKeerYnT8Nvf0QmHCRC1n8sfWVwXF2Frvo=
 github.com/jhump/protoreflect v1.15.1 h1:HUMERORf3I3ZdX05WaQ6MIpd/NJ434hTp5YiKgfCL6c=
