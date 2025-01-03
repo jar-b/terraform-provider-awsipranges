@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/jar-b/awsipranges"
@@ -150,11 +151,16 @@ func (d *RangesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 
 	ipPrefixes, err := d.ranges.Filter(ipFilters)
 	if err != nil {
-		resp.Diagnostics.AddError("Filter error", err.Error())
+		resp.Diagnostics.AddError("Filter Error", err.Error())
 		return
 	}
 
 	elemType := types.ObjectType{AttrTypes: ipPrefixAttrType}
+	if len(ipPrefixes) == 0 {
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("ip_prefixes"), types.ListNull(elemType))...)
+		return
+	}
+
 	elems := []attr.Value{}
 	for _, p := range ipPrefixes {
 		obj := map[string]attr.Value{
@@ -164,16 +170,11 @@ func (d *RangesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 			"service":              types.StringValue(p.Service),
 		}
 
-		// TODO: rm Must and handle diags
-		elems = append(elems, types.ObjectValueMust(ipPrefixAttrType, obj))
+		e, diag := types.ObjectValue(ipPrefixAttrType, obj)
+
+		resp.Diagnostics.Append(diag...)
+		elems = append(elems, e)
 	}
 
-	if len(ipPrefixes) > 0 {
-		// TODO: rm Must and handle diags
-		data.IPPrefixes = types.ListValueMust(elemType, elems)
-	} else {
-		data.IPPrefixes = types.ListNull(elemType)
-	}
-
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("ip_prefixes"), elems)...)
 }
