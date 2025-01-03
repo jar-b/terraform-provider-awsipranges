@@ -116,6 +116,19 @@ func TestAccRangesDataSourceNoMatch(t *testing.T) {
 	})
 }
 
+func TestAccRangesDataSourceInvalidFilter(t *testing.T) {
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccRangesDataSourceConfig("invalid", ""),
+				ExpectError: regexp.MustCompile("value must be one of"),
+			},
+		},
+	})
+}
+
 func testAccRangesDataSourceConfig(filterType, value string) string {
 	return fmt.Sprintf(`
 data "awsipranges_ranges" "test" {

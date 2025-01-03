@@ -39,7 +39,7 @@ data "awsipranges_ranges" "example" {
 
 Required:
 
-- `type` (String) Filter type. Valid values are: `ip`, `region`, `network_border_group`, and `service`.
+- `type` (String) Filter type. Valid values are: `ip`, `network-border-group`, `region`, and `service`.
 - `values` (List of String) Filter values.
 
 

@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/jar-b/awsipranges"
@@ -61,8 +63,16 @@ func (d *RangesDataSource) Schema(ctx context.Context, req datasource.SchemaRequ
 					Attributes: map[string]schema.Attribute{
 						"type": schema.StringAttribute{
 							Required: true,
-							MarkdownDescription: "Filter type. Valid values are: `ip`, `region`, " +
-								"`network_border_group`, and `service`.",
+							MarkdownDescription: "Filter type. Valid values are: `ip`, `network-border-group`, " +
+								"`region`, and `service`.",
+							Validators: []validator.String{
+								stringvalidator.OneOfCaseInsensitive(
+									string(awsipranges.FilterTypeIP),
+									string(awsipranges.FilterTypeNetworkBorderGroup),
+									string(awsipranges.FilterTypeRegion),
+									string(awsipranges.FilterTypeService),
+								),
+							},
 						},
 						"values": schema.ListAttribute{
 							ElementType:         types.StringType,
