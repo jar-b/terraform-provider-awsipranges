@@ -1,6 +1,6 @@
 # Terraform Provider AWS IP Ranges
 
-Terraform provider for interacting with AWS IP ranges data.
+Terraform provider for working with public AWS IP range data.
 
 This provider offers the same functionality as the [`aws_ip_ranges` data source](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ip_ranges) in the [AWS provider](https://registry.terraform.io/providers/hashicorp/aws/latest), but with some marginal benefits such as a smaller binary size and optional caching to improve performance.
 
