@@ -16,9 +16,13 @@ Checks whether an IP address is in an AWS range.
 data "awsipranges_ranges" "example" {
   filters = [
     {
-      type  = "ip"
-      value = "3.5.12.4"
-    }
+      type   = "ip"
+      values = ["3.5.12.4"]
+    },
+    {
+      type   = "service"
+      values = ["S3"]
+    },
   ]
 }
 ```

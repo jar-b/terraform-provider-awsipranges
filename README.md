@@ -31,8 +31,8 @@ Example are included below.
 data "awsipranges_ranges" "example" {
   filters = [
     {
-      type  = "ip"
-      value = "3.5.12.4"
+      type   = "ip"
+      values = ["3.5.12.4"]
     }
   ]
 }
@@ -44,8 +44,8 @@ data "awsipranges_ranges" "example" {
 data "awsipranges_ranges" "example" {
   filters = [
     {
-      type  = "region"
-      value = "us-east-1"
+      type   = "region"
+      values = ["us-east-1"]
     }
   ]
 }
@@ -57,8 +57,8 @@ data "awsipranges_ranges" "example" {
 data "awsipranges_ranges" "example" {
   filters = [
     {
-      type  = "service"
-      value = "S3"
+      type   = "service"
+      values = ["S3"]
     }
   ]
 }
