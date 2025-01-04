@@ -53,15 +53,16 @@ func (p *AWSIPRangesProvider) Metadata(ctx context.Context, req provider.Metadat
 
 func (p *AWSIPRangesProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		MarkdownDescription: "Terraform provider for working with public AWS IP range data.",
 		Attributes: map[string]schema.Attribute{
 			"cachefile": schema.StringAttribute{
-				MarkdownDescription: "Location to cache the ip-ranges.json file. The provider will attempt" +
-					"to cache the ranges file in a default location and read from it on subsequent runs if no " +
-					"value is provided.",
+				MarkdownDescription: fmt.Sprintf("Location to cache the `ip-ranges.json` file. If no value is provided, "+
+					"the provider will attempt to cache the ranges file in a default location (`%s` "+
+					"inside the current user's home directory) and read from it on subsequent runs.", cachefilePath),
 				Optional: true,
 			},
 			"expiration": schema.StringAttribute{
-				MarkdownDescription: "Duration after which the cached ranges file should be replaced.",
+				MarkdownDescription: "Duration after which the cached `ip-ranges.json` file should be replaced.",
 				Optional:            true,
 			},
 		},

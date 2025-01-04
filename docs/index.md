@@ -3,12 +3,12 @@
 page_title: "awsipranges Provider"
 subcategory: ""
 description: |-
-  
+  Terraform provider for working with public AWS IP range data.
 ---
 
 # awsipranges Provider
 
-
+Terraform provider for working with public AWS IP range data.
 
 ## Example Usage
 
@@ -25,5 +25,5 @@ provider "awsipranges" {
 
 ### Optional
 
-- `cachefile` (String) Location to cache the ip-ranges.json file. The provider will attemptto cache the ranges file in a default location and read from it on subsequent runs if no value is provided.
-- `expiration` (String) Duration after which the cached ranges file should be replaced.
+- `cachefile` (String) Location to cache the `ip-ranges.json` file. If no value is provided, the provider will attempt to cache the ranges file in a default location (`.aws/ip-ranges.json` inside the current user's home directory) and read from it on subsequent runs.
+- `expiration` (String) Duration after which the cached `ip-ranges.json` file should be replaced.
