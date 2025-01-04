@@ -2,7 +2,7 @@
 
 Terraform provider for working with public AWS IP range data.
 
-This provider offers the same functionality as the [`aws_ip_ranges` data source](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ip_ranges) in the [AWS provider](https://registry.terraform.io/providers/hashicorp/aws/latest), but with some marginal benefits such as a smaller binary size and optional caching to improve performance.
+This provider offers the same functionality as the [`aws_ip_ranges` data source](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ip_ranges) in the [AWS provider](https://registry.terraform.io/providers/hashicorp/aws/latest), but with some marginal benefits such as a smaller binary size and optional caching to reduce or eliminate network latency.
 
 ## Requirements
 
@@ -20,6 +20,25 @@ go install
 ```
 
 ## Using the provider
+
+The provider can be configured with no options to use the default caching location (`.aws/ip-ranges.json` in the calling user's home directory).
+Failure to cache the file will not trigger an error, but will result in the provider fetching the file once during each new invocation of the provider.
+
+```terraform
+provider "awsipranges" {}
+```
+
+Optional arguments are available to customize the cache file path and cache expiration.
+
+```terraform
+provider "awsipranges" {
+  # optional cache configuration
+  cachefile  = "path/to/cache/ip-ranges.json"
+  expiration = "72h"
+}
+```
+
+### Data sources
 
 This provider currently only exposes one data source for fetching and filtering IPv4 ranges published by AWS.
 The ranges can be filtered by IP address, region, network border group, or service.
