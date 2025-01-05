@@ -84,6 +84,11 @@ func (p *AWSIPRangesProvider) Configure(ctx context.Context, req provider.Config
 
 	ranges, err := loadRanges(ctx, cachefile, data.Expiration.ValueString())
 	if err != nil {
+		resp.Diagnostics.AddError(
+			"Failed To Load IP Ranges",
+			err.Error(),
+		)
+		return
 	}
 
 	resp.DataSourceData = ranges
