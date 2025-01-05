@@ -9,7 +9,7 @@ This provider offers the same functionality as the [`aws_ip_ranges` data source]
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
 - [Go](https://golang.org/doc/install) >= 1.22
 
-## Building The Provider
+## Building the Provider
 
 1. Clone the repository
 1. Enter the repository directory
@@ -19,9 +19,9 @@ This provider offers the same functionality as the [`aws_ip_ranges` data source]
 go install
 ```
 
-## Using the provider
+## Using the Provider
 
-The provider can be configured with no options to use the default caching location (`.aws/ip-ranges.json` in the calling user's home directory).
+The provider can be configured with no options to use the default caching location (`.aws/ip-ranges.json` in the calling user's home directory) and cache expiration (30 days).
 Failure to cache the file will not trigger an error, but will result in the provider fetching the file once during each new invocation of the provider.
 
 ```terraform
@@ -34,11 +34,11 @@ Optional arguments are available to customize the cache file path and cache expi
 provider "awsipranges" {
   # optional cache configuration
   cachefile  = "path/to/cache/ip-ranges.json"
-  expiration = "72h"
+  expiration = "240h"
 }
 ```
 
-### Data sources
+### Using the Data Source
 
 This provider currently only exposes one data source for fetching and filtering IPv4 ranges published by AWS.
 The ranges can be filtered by IP address, region, network border group, or service.
