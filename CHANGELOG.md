@@ -1,4 +1,4 @@
-## 0.2.0 (Unreleased)
+## 0.2.0 (January 5, 2025)
 
 FEATURES:
 - Set a default cache `expiration` value of `720h` (30 days)
