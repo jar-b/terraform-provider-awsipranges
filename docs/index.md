@@ -16,7 +16,7 @@ Terraform provider for working with public AWS IP range data.
 provider "awsipranges" {
   # optional cache configuration
   cachefile  = "path/to/cache/ip-ranges.json"
-  expiration = "72h"
+  expiration = "240h"
 }
 ```
 
