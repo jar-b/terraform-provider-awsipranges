@@ -26,4 +26,4 @@ provider "awsipranges" {
 ### Optional
 
 - `cachefile` (String) Location to cache the `ip-ranges.json` file. If no value is provided, the provider will attempt to cache the ranges file in a default location (`.aws/ip-ranges.json` inside the current user's home directory) and read from it on subsequent runs.
-- `expiration` (String) Duration after which the cached `ip-ranges.json` file should be replaced.
+- `expiration` (String) Duration after which the cached `ip-ranges.json` file should be replaced. If no value is provided, the provider will use a default value of `720h` (30 days). If the cache should never be expired, set the value to an empty string. Cache expiration is triggered by a comparison against the `createDate` field in the source `ip-ranges.json` file, not the time stamp when the cache file was written, so setting this to a very low value is likely to result in the source being fetched anew each time the provider is configured.

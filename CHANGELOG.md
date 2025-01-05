@@ -1,5 +1,8 @@
 ## 0.2.0 (Unreleased)
 
+FEATURES:
+- Set a default cache `expiration` value of `720h` (30 days)
+
 BUG FIXES:
 - Handle errors loading the `ip-ranges.json` file
 

@@ -20,7 +20,8 @@ import (
 )
 
 const (
-	cachefilePath = ".aws/ip-ranges.json"
+	cachefilePath     = ".aws/ip-ranges.json"
+	defaultExpiration = "720h"
 
 	// createDateFormat is the format of the `createDate` field in the
 	// underlying JSON (YY-MM-DD-hh-mm-ss)
@@ -62,8 +63,13 @@ func (p *AWSIPRangesProvider) Schema(ctx context.Context, req provider.SchemaReq
 				Optional: true,
 			},
 			"expiration": schema.StringAttribute{
-				MarkdownDescription: "Duration after which the cached `ip-ranges.json` file should be replaced.",
-				Optional:            true,
+				MarkdownDescription: "Duration after which the cached `ip-ranges.json` file should be replaced. If " +
+					"no value is provided, the provider will use a default value of `720h` (30 days). If the cache should " +
+					"never be expired, set the value to an empty string. Cache expiration is triggered by a comparison " +
+					"against the `createDate` field in the source `ip-ranges.json` file, not the time stamp when the " +
+					"cache file was written, so setting this to a very low value is likely to result in the source " +
+					"being fetched anew each time the provider is configured.",
+				Optional: true,
 			},
 		},
 	}
@@ -82,7 +88,12 @@ func (p *AWSIPRangesProvider) Configure(ctx context.Context, req provider.Config
 		cachefile = defaultCachefilePath()
 	}
 
-	ranges, err := loadRanges(ctx, cachefile, data.Expiration.ValueString())
+	expiration := defaultExpiration
+	if !data.Expiration.IsNull() {
+		expiration = data.Expiration.ValueString()
+	}
+
+	ranges, err := loadRanges(ctx, cachefile, expiration)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Failed To Load IP Ranges",
