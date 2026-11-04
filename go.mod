@@ -1,6 +1,6 @@
 module github.com/jar-b/terraform-provider-awsipranges
 
-go 1.23.0
+go 1.27.3
 
 require (
 	github.com/hashicorp/terraform-plugin-framework v1.13.0
