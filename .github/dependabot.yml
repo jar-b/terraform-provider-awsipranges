@@ -7,5 +7,9 @@ version: 2
 updates:
   - package-ecosystem: "gomod"
     directory: "/"
+    groups:
+      terraform-plugin:
+        patterns:
+          - "github.com/hashicorp/terraform-plugin-*"
     schedule:
       interval: "weekly"
